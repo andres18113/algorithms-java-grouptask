@@ -7,7 +7,13 @@ package ec.edu.uce.algorithms.sorting;
  * @version 1.0
  */
 public class SelectionSort implements SortingAlgorithm {
-
+    /**
+     * Sorts the array in ascending order using the Selection Sort algorithm.
+     *
+     * @param values the array to sort; must not be {@code null}
+     * @param metrics the object that records comparisons and movements; must not be {@code null}
+     * @throws IllegalArgumentException if either {@code values} or {@code metrics} is {@code null}
+     */
     @Override
     public void sort(int[] values, SortMetrics metrics) {
         if (values == null || metrics == null) {
