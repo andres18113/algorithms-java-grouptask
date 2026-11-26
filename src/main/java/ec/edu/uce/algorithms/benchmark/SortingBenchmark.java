@@ -7,7 +7,11 @@ import ec.edu.uce.algorithms.sorting.ShellSort;
 import ec.edu.uce.algorithms.sorting.SortMetrics;
 import ec.edu.uce.algorithms.sorting.SortingAlgorithm;
 
+import java.io.IOException;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Locale;
 
 /** Measures the four sorting algorithms on equivalent datasets. */
@@ -18,6 +22,26 @@ public final class SortingBenchmark {
     private static final long SEED = 42L;
 
     private SortingBenchmark() {
+    }
+
+    /**
+     * Runs the benchmark and saves its results to a CSV file.
+     *
+     * @param args command-line arguments
+     * @throws IOException if the results folder or file cannot be written
+     */
+    public static void main(String[] args) throws IOException {
+        Path csv = Path.of("results", "tables", "benchmark_results.csv");
+        Files.createDirectories(csv.getParent());
+
+        try (PrintStream file = new PrintStream(csv.toFile(), StandardCharsets.UTF_8)) {
+            run(file);
+            if (file.checkError()) {
+                throw new IOException("Could not write " + csv);
+            }
+        }
+
+        System.out.println("CSV saved to: " + csv.toAbsolutePath());
     }
 
     /**

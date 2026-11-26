@@ -20,13 +20,18 @@ java -cp target/classes ec.edu.uce.algorithms.Main
 
 Run `mvn test` to run the JUnit 5 tests.
 
-The default command demonstrates complexity, iteration, recursion, and all four sorts.
-Use `--help` to see the available modes.
+In IntelliJ IDEA, run `Main.java` to see the examples for complexity,
+iteration, recursion, and all four sorts.
 
 ## Sorting benchmark
 
+In IntelliJ IDEA, run `SortingBenchmark.java` to save the results automatically
+to `results/tables/benchmark_results.csv` in the project folder.
+
+To run the benchmark from the terminal:
+
 ```powershell
-java -cp target/classes ec.edu.uce.algorithms.Main --benchmark > sorting-results.csv
+java -cp target/classes ec.edu.uce.algorithms.benchmark.SortingBenchmark
 ```
 
 The benchmark compares Bubble, Selection, Insertion, and Shell Sort for arrays of
