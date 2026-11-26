@@ -6,34 +6,34 @@ import java.nio.charset.StandardCharsets;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MainTest {
-    @Test
-    void demonstratesTheRequiredModules() {
-        var output = new ByteArrayOutputStream();
-        try (var stream = new PrintStream(output, true, StandardCharsets.UTF_8)) {
-            assertEquals(0, Main.run(new String[0], stream, stream));
-        }
+    private final ByteArrayOutputStream output = new ByteArrayOutputStream();
+    private final PrintStream console = new PrintStream(output, true, StandardCharsets.UTF_8);
 
-        String report = output.toString(StandardCharsets.UTF_8);
-        assertTrue(report.contains("Quadratic n=100: measured=9900, expected=9900"));
-        assertTrue(report.contains("Logarithmic n=16: divisions=4"));
-        assertTrue(report.contains("Factorial of 5: iterative=120, recursive=120"));
-        assertTrue(report.contains("Array sum: iterative=30, recursive=30"));
-        assertTrue(report.contains("Array maximum: iterative=10, recursive=10"));
-        for (String algorithm : new String[]{"BubbleSort", "SelectionSort", "InsertionSort", "ShellSort"}) {
-            assertTrue(report.contains(algorithm + ": [3, 12, 12, 18, 45, 45, 70, 90]"));
-        }
+    @Test
+    void printsComplexityAndPairedExamples() {
+        Main.demonstrate(console);
+        String text = output.toString(StandardCharsets.UTF_8);
+
+        assertTrue(text.contains("Linear: n=5, sum=30"));
+        assertTrue(text.contains("Quadratic n=100: measured=9900, expected=9900"));
+        assertTrue(text.contains("Logarithmic n=16: divisions=4"));
+        assertTrue(text.contains("Factorial of 5: iterative=120, recursive=120"));
+        assertTrue(text.contains("Array sum: iterative=30, recursive=30"));
+        assertTrue(text.contains("Array maximum: iterative=10, recursive=10"));
     }
 
     @Test
-    void invalidArgumentsPrintUsageAndReturnAnError() {
-        var error = new ByteArrayOutputStream();
-        try (var stream = new PrintStream(error, true, StandardCharsets.UTF_8)) {
-            assertEquals(2, Main.run(new String[]{"--unknown"}, stream, stream));
-        }
-        assertTrue(error.toString(StandardCharsets.UTF_8).contains("--benchmark"));
+    void showsTheSortedArrayForEachAlgorithm() {
+        Main.demonstrate(console);
+        String text = output.toString(StandardCharsets.UTF_8);
+
+        String sorted = ": [3, 12, 12, 18, 45, 45, 70, 90]";
+        assertTrue(text.contains("BubbleSort" + sorted));
+        assertTrue(text.contains("SelectionSort" + sorted));
+        assertTrue(text.contains("InsertionSort" + sorted));
+        assertTrue(text.contains("ShellSort" + sorted));
     }
 }

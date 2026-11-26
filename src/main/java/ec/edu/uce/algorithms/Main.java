@@ -1,6 +1,5 @@
 package ec.edu.uce.algorithms;
 
-import ec.edu.uce.algorithms.benchmark.SortingBenchmark;
 import ec.edu.uce.algorithms.complexity.LinearComplexity;
 import ec.edu.uce.algorithms.complexity.LogarithmicComplexity;
 import ec.edu.uce.algorithms.complexity.QuadraticComplexity;
@@ -18,80 +17,86 @@ import ec.edu.uce.algorithms.sum.ArraySum;
 import java.io.PrintStream;
 import java.util.Arrays;
 
-/** Runs the algorithm demonstrations or the sorting benchmark from the console. */
+/** Prints the assignment examples in the console. */
 public final class Main {
-    private static final String USAGE = "Usage: Main [--demo | --benchmark | --help]";
-
     private Main() {
     }
 
     /**
-     * Runs the selected console mode. With no arguments, shows the demonstrations.
+     * Prints the examples for each activity.
      *
-     * @param args an optional mode flag
+     * @param args command-line arguments
      */
     public static void main(String[] args) {
-        int status = run(args, System.out, System.err);
-        if (status != 0) {
-            System.exit(status);
-        }
+        demonstrate(System.out);
     }
 
-    static int run(String[] args, PrintStream output, PrintStream errors) {
-        if (args.length == 0 || (args.length == 1 && args[0].equals("--demo"))) {
-            demonstrate(output);
-        } else if (args.length == 1 && args[0].equals("--benchmark")) {
-            SortingBenchmark.run(output);
-        } else if (args.length == 1 && args[0].equals("--help")) {
-            output.println(USAGE);
-        } else {
-            errors.println(USAGE);
-            return 2;
-        }
-        return 0;
-    }
-
-    private static void demonstrate(PrintStream output) {
+    static void demonstrate(PrintStream output) {
         output.println("Algorithm Analysis and Implementation in Java");
-        output.println();
 
         int[] assignmentValues = {8, 3, 10, 2, 7};
-        output.printf("Linear: n=%d, sum=%d%n",
-                assignmentValues.length, new LinearComplexity().calculateSum(assignmentValues));
-        for (int size : new int[]{10, 100, 1_000}) {
-            var result = QuadraticComplexity.analyze(new int[size]);
+        showComplexity(output, assignmentValues);
+        showIterationAndRecursion(output, assignmentValues);
+        showSorting(output);
+
+        output.println("Run SortingBenchmark to save the sorting results as CSV.");
+    }
+
+    private static void showComplexity(PrintStream output, int[] values) {
+        output.println();
+        LinearComplexity linear = new LinearComplexity();
+        long sum = linear.calculateSum(values);
+        output.println("Linear: n=" + values.length + ", sum=" + sum);
+
+        int[] sizes = {10, 100, 1_000};
+        for (int size : sizes) {
+            int[] input = new int[size];
+            long measured = QuadraticComplexity.analyze(input).comparisons();
             long expected = (long) size * (size - 1);
-            output.printf("Quadratic n=%d: measured=%d, expected=%d%n",
-                    size, result.comparisons(), expected);
-        }
-        for (int number : new int[]{1, 10, 16}) {
-            output.printf("Logarithmic n=%d: divisions=%d%n",
-                    number, LogarithmicComplexity.countDivisions(number));
+            output.println("Quadratic n=" + size + ": measured=" + measured + ", expected=" + expected);
         }
 
-        output.println();
-        var factorial = new FactorialAlgorithms();
-        output.printf("Factorial of 5: iterative=%d, recursive=%d%n",
-                factorial.calculateFactorialIterative(5), factorial.calculateFactorialRecursive(5));
-        output.printf("Array sum: iterative=%d, recursive=%d%n",
-                ArraySum.sumIterative(assignmentValues), ArraySum.sumRecursive(assignmentValues, 0));
-        output.printf("Array maximum: iterative=%d, recursive=%d%n",
-                ArrayMaximum.maxIterative(assignmentValues), ArrayMaximumRecursive.maxRecursive(assignmentValues));
-
-        output.println();
-        int[] sortingValues = {45, 12, 90, 12, 3, 70, 45, 18};
-        output.println("Sorting input: " + Arrays.toString(sortingValues));
-        var algorithms = new SortingAlgorithm[]{
-                new BubbleSort(), new SelectionSort(), new InsertionSort(), new ShellSort()
-        };
-        for (SortingAlgorithm algorithm : algorithms) {
-            int[] copy = sortingValues.clone();
-            var metrics = new SortMetrics();
-            algorithm.sort(copy, metrics);
-            output.printf("%s: %s, comparisons=%d, movements=%d%n",
-                    algorithm.getClass().getSimpleName(), Arrays.toString(copy),
-                    metrics.getComparisons(), metrics.getMovements());
+        int[] numbers = {1, 10, 16};
+        for (int number : numbers) {
+            int divisions = LogarithmicComplexity.countDivisions(number);
+            output.println("Logarithmic n=" + number + ": divisions=" + divisions);
         }
-        output.println("Run with --benchmark to produce the full sorting experiment as CSV.");
+    }
+
+    private static void showIterationAndRecursion(PrintStream output, int[] values) {
+        output.println();
+        FactorialAlgorithms factorial = new FactorialAlgorithms();
+        long iterativeFactorial = factorial.calculateFactorialIterative(5);
+        long recursiveFactorial = factorial.calculateFactorialRecursive(5);
+        output.println("Factorial of 5: iterative=" + iterativeFactorial + ", recursive=" + recursiveFactorial);
+
+        long iterativeSum = ArraySum.sumIterative(values);
+        long recursiveSum = ArraySum.sumRecursive(values, 0);
+        output.println("Array sum: iterative=" + iterativeSum + ", recursive=" + recursiveSum);
+
+        int iterativeMaximum = ArrayMaximum.maxIterative(values);
+        int recursiveMaximum = ArrayMaximumRecursive.maxRecursive(values);
+        output.println("Array maximum: iterative=" + iterativeMaximum + ", recursive=" + recursiveMaximum);
+    }
+
+    private static void showSorting(PrintStream output) {
+        output.println();
+        int[] input = {45, 12, 90, 12, 3, 70, 45, 18};
+        output.println("Sorting input: " + Arrays.toString(input));
+
+        showSort(output, "BubbleSort", new BubbleSort(), input);
+        showSort(output, "SelectionSort", new SelectionSort(), input);
+        showSort(output, "InsertionSort", new InsertionSort(), input);
+        showSort(output, "ShellSort", new ShellSort(), input);
+    }
+
+    private static void showSort(PrintStream output, String name, SortingAlgorithm algorithm, int[] input) {
+        int[] copy = input.clone();
+        SortMetrics metrics = new SortMetrics();
+        algorithm.sort(copy, metrics);
+
+        output.println(name + ": " + Arrays.toString(copy)
+                + ", comparisons=" + metrics.getComparisons()
+                + ", movements=" + metrics.getMovements());
     }
 }
