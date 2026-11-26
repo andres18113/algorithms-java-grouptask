@@ -34,4 +34,23 @@ class ArraySumTest {
     void sumRecursiveSumsValues() {
         assertEquals(10L, ArraySum.sumRecursive(new int[]{1, 2, 3, 4}, 0));
     }
+    @Test
+    void sumIterativeCalculatesExampleValues() {
+        assertEquals(30L, ArraySum.sumIterative(new int[]{8, 3, 10, 2, 7}));
+        assertEquals(7L, ArraySum.sumIterative(new int[]{7}));
+        assertEquals(-7L, ArraySum.sumIterative(new int[]{-8, 3, -2}));
+    }
+
+    @Test
+    void sumRecursiveCalculatesExampleValues() {
+        assertEquals(30L, ArraySum.sumRecursive(new int[]{8, 3, 10, 2, 7}, 0));
+        assertEquals(7L, ArraySum.sumRecursive(new int[]{7}, 0));
+        assertEquals(-7L, ArraySum.sumRecursive(new int[]{-8, 3, -2}, 0));
+    }
+
+    @Test
+    void sumRecursiveThrowsOnInvalidIndex() {
+        assertThrows(IllegalArgumentException.class, () -> ArraySum.sumRecursive(new int[]{1, 2, 3}, -1));
+        assertThrows(IllegalArgumentException.class, () -> ArraySum.sumRecursive(new int[]{1, 2, 3}, 4));
+    }
 }
